@@ -82,6 +82,3 @@ By successfully simulating and detecting the final stages of **Persistence** and
 2.  **Develop high-fidelity detection logic** in a SIEM (Splunk).
 3.  **Map complex incidents** back to the MITRE ATT\&CK Framework.
 
------
-
-Would you like final guidance on compiling your full project documentation, including the organization and presentation of your final dashboards?
