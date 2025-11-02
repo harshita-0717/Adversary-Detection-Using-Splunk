@@ -212,6 +212,125 @@ The final SQL query executed by the vulnerable PHP script will be:
 
 Since `'1'='1'` is always true, the database will return the first user (the **admin**) and grant you access, bypassing the password check.
 
-You are now set up to practice the attack and, more importantly, to **capture and analyze the event in Splunk** and implement **defensive coding (using Prepared Statements)**, which is the ultimate goal of your project.
+That's fantastic news\! 🎉
 
-Would you like the instructions for **implementing the secure version** of the login page (the **mitigation strategy**) for comparison?
+Achieving the **`SUCCESS! Login successful for user: admin`** message using an injected payload confirms you have successfully performed an **SQL Injection Authentication Bypass** attack against your deliberately vulnerable application. You have demonstrated the core **Initial Access (TA0001)** concept in your project.
+
+Since the attack is verified, the next logical steps for your cybersecurity project—which focuses on the full cycle of attack, analysis, and defense—are:
+
+1.  **Analysis:** Capture and analyze the malicious request in a tool like Splunk.
+2.  **Mitigation:** Secure the application against this vulnerability.
+
+Let's move directly to the **Mitigation Strategy**.
+
+-----
+
+## 🛡️ Implementing Mitigation: Secure Login Page
+
+The permanent defense against SQL Injection is to use **Prepared Statements**. This technique separates the SQL query logic from the user-supplied data, ensuring the input is *always* treated as data and never executable code.
+
+We will create a new, secure version of the login script, named `secure_login.php`.
+
+### 1\. Create the Secure Login Script (`secure_login.php`)
+
+On your **Ubuntu VM**, create a new file:
+
+```bash
+sudo nano /var/www/html/secure_login.php
+```
+
+Paste the following content. Note the use of `prepare()` and `bind_param()` instead of direct concatenation:
+
+```php
+<?php
+// Configuration (Use the same credentials as before)
+$servername = "localhost";
+$username = "root";
+// WARNING: Replace with your actual MySQL root password
+$password = "YOUR_MYSQL_ROOT_PASSWORD"; 
+$dbname = "vulnerable_app";
+
+$message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // 1. Connect to the database
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    // Get user input
+    $user_input = $_POST['username'];
+    $pass_input = $_POST['password'];
+
+    // 2. SECURE QUERY: Use a placeholder (?) for user input
+    $sql = "SELECT username FROM users WHERE username = ? AND password = ?";
+    
+    // 3. Prepare the statement
+    $stmt = $conn->prepare($sql);
+
+    // 4. Bind parameters: 'ss' means two parameters, both strings
+    // This tells the database to treat the input variables ($user_input, $pass_input) ONLY as data.
+    $stmt->bind_param("ss", $user_input, $pass_input);
+
+    // 5. Execute the statement
+    $stmt->execute();
+
+    // 6. Get the result
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $message = "<div style='color: green;'><strong>SECURE SUCCESS!</strong> Login successful.</div>";
+    } else {
+        $message = "<div style='color: red;'>Login failed: Invalid username or password.</div>";
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SECURE Login Page (Prepared Statements)</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 50px; }
+        .login-box { background: #e0fff0; padding: 20px; border: 2px solid #0a0; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; margin: auto; }
+        input[type=text], input[type=password] { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        input[type=submit] { background-color: #008000; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Secure Login Page</h2>
+        <?php echo $message; ?>
+        <form method="post" action="secure_login.php">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <input type="submit" value="Login">
+        </form>
+        <p style="font-size: 0.8em; color: #555;">
+            *Use 'admin'/'password' to log in normally.
+        </p>
+        <p style="font-size: 0.8em; color: green;">
+            *This page uses Prepared Statements and is secure.
+        </p>
+    </div>
+</body>
+</html>
+```
+
+### 2\. Verify the Secure Page
+
+1.  Open your browser on **Kali** and navigate to: `http://[Ubuntu-VM-IP-Address]/secure_login.php`
+2.  Try the **normal login** (`admin`/`password`)—it should succeed.
+3.  Try the **SQL Injection payload** (` admin' OR 1=1 --  ` in the username field)—it should **fail** and display the "Login failed" message.
+
+If the SQLi payload fails to bypass the login, your application is now secure against this specific vulnerability\!
+
+-----
+
+## 📊 Next Step: Security Analysis with Splunk
+
