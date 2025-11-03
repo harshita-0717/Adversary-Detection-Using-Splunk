@@ -181,3 +181,61 @@ index=os_logs sourcetype=access_combined "GET /ping.php" (
 ```
 
   * **Critical Learning:** The combination of **specific web path** (`ping.php`) and **shell characters** (`&`, `|`, `;`) is a strong indicator of Command Injection (RCE).
+
+That is the perfect next step\! You have executed a critical attack and now need to fulfill the role of the SOC analyst by implementing both **Detection (Dashboard)** and **Prevention (Mitigation)** strategies.
+
+Here is the plan for the Command Injection attack (T1203).
+
+-----
+
+## 🛡️ Phase 4: Mitigation Strategy
+
+### Part A: Mitigation Strategy (Prevention)
+
+The ultimate goal of defense is to stop the attack before it reaches the logs. The core of mitigation is fixing the vulnerability in the `ping.php` code.
+
+| Mitigation Technique | Description | PHP Code Implementation |
+| :--- | :--- | :--- |
+| **Input Sanitization** | **MUST-HAVE:** Ensure that any external input passed to a shell function (`shell_exec`, `exec`, `system`) is treated as a single, literal string and cannot contain shell meta-characters (`&`, `|`, `;`). | Use the built-in PHP function **`escapeshellarg()`** to properly quote and escape the user input. |
+
+#### **The Secured PHP Code**
+
+On your **Ubuntu VM**, update the `ping.php` file to use `escapeshellarg()`:
+
+```php
+// BEFORE (VULNERABLE):
+// $command = "ping -c 4 " . $target;
+
+// AFTER (SECURE):
+// 1. Sanitize the user input
+$sanitized_target = escapeshellarg($target);
+
+// 2. Build the command using the sanitized input
+$command = "ping -c 4 " . $sanitized_target;
+
+// Now, if the attacker inputs "127.0.0.1 & whoami", the shell sees it as one long, safe filename.
+```
+
+### Part B: Splunk Dashboard Panel (Detection)
+
+We will integrate the Command Injection detection rule into your main "Adversary Detection Summary" dashboard.
+
+#### **Command Injection Dashboard Panel**
+
+| Panel Title | SPL Query | Visualization |
+| :--- | :--- | :--- |
+| **RCE Attempt: Command Injection** | `index=os_logs sourcetype=access_combined "GET /ping.php" ("&" OR "|" OR ";" OR "whoami" OR "nc") | stats count as RCE_Attempts by clientip, _time | where RCE_Attempts > 0 | table _time, clientip, RCE_Attempts` | **Table** or **Single Value** (Shows the number of attempts and the source IP) |
+| **What it detects:** | **T1203 - Command Injection** (Identifies the shell meta-characters and malicious commands in the web request logs). | |
+
+-----
+
+## 🎨 Dashboard Creation Steps
+
+1.  **Open/Edit Dashboard:** Go to your **`Adversary Detection Summary`** dashboard and click **Edit**.
+2.  **Add Panel:** Click **Add Input** $\rightarrow$ **New (Search)**.
+3.  **Paste Query:** Paste the SPL from the table above.
+4.  **Title:** Set the title to **`RCE Attempt: Command Injection`**.
+5.  **Visualize:** Select **Table** for the visualization type.
+6.  **Save:** Click **Add to Dashboard** and then **Save** the dashboard.
+
+By doing this, we've completed the full cycle for Command Injection: attack, detection, and prevention.
