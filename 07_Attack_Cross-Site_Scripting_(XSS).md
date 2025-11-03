@@ -1,4 +1,4 @@
-# Cross-Site Scripting (XSS) - Reflected or Stored (T0866)
+# 🗺️Cross-Site Scripting (XSS) - Reflected or Stored (T0866)
 
 
 
