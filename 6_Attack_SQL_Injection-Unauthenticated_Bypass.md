@@ -326,11 +326,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 1.  Open your browser on **Kali** and navigate to: `http://[Ubuntu-VM-IP-Address]/secure_login.php`
 2.  Try the **normal login** (`admin`/`password`)—it should succeed.
-3.  Try the **SQL Injection payload** (` admin' OR 1=1 --  ` in the username field)—it should **fail** and display the "Login failed" message.
+3.  Try the **SQL Injection payload** (` admin' OR '1'='1  ` in the username field)—it should **fail** and display the "Login failed" message.
 
 If the SQLi payload fails to bypass the login, your application is now secure against this specific vulnerability\!
 
 -----
 
 ## 📊 Next Step: Security Analysis with Splunk
+
+We will move forward with **Analysing the log & creating the Splunk Alert** using a robust set of SQL Injection keywords.
+
+-----
+
+We will save our working search as the base and add the SQLi detection logic to it.
+
+### Step 1: Search Query for Alert Creation
+
+Use your working base search and apply the common SQLi patterns to the filtered events:
+
+1.  In the Splunk Search & Reporting app, enter the following query:
+
+    ```spl
+    index=main sourcetype="access_combined" "POST /login.php" | search ("OR%201%3D1" OR "UNION%20SELECT" OR "%2D%2D" OR "%23")
+    ```
+
+      * **Explanation:** This search first finds all `POST` requests to the vulnerable page, and then filters those results for the common URL-encoded SQL Injection patterns (`OR 1=1`, `UNION SELECT`, double hyphen `--`, and hash `#`).
+      * This is not working for me, So I am using another technique
+
+2. Search for the Comment Sequence
+
+   The number **`925`** in your Apache access log for the `POST` request is the **size of the response body, in bytes**.
+
+Here is a breakdown of that specific section of the log line:
+
+```
+... "POST /login.php HTTP/1.1" 200 925 ...
+```
+
+-----
+
+## 📐 Meaning of the Log Fields
+
+The segment of the access log highlighted follows the standard Apache Common Log Format (CLF) extension for including status codes and byte sizes:
+
+  * **`200` (Status Code):** This is the **HTTP Status Code** returned by the server.
+      * `200` means **"OK"** or **"Success"**. This is an **important indicator** for your SQL injection attack because a successful login bypass returns a normal, successful page, unlike a failed login which might return a `401 Unauthorized` or redirect.
+  * **`925` (Response Size):** This is the **size of the object or page returned to the client (your Kali browser)**, measured in bytes.
+      * In this context, **`925`** is the size of the **HTML content** of the successful login page (the one that displayed `"SUCCESS! Login successful for user: admin"`).
+
+-----
+
+## 🔎 Security Implication for our Project
+
+The byte size can be a powerful detection tool, especially for **Blind SQL Injection** or for identifying successful authentication bypasses:
+
+1.  **Baseline vs. Malicious:** If a successful login page is always **`925` bytes**, but a failed login page is only **`450` bytes**, a security analyst can look for the sudden shift to the larger byte size as an indicator of an **Authentication Bypass**, even without seeing the payload\!
+2.  **Detection Evasion:** Attackers often use byte size variations to confirm if their injection payload was successful in changing the application's logic.
+
+---
+
+### Step 2: Save the Search as an Alert
+
+1.  Set the time range to **Last 5 minutes** (to prevent accidental triggers on historical data).
+2.  Click the **Save As** dropdown menu $\rightarrow$ Select **Alert**.
+
+### Step 3: Configure and Save the Alert
+
+Configure the following fields in the alert creation window:
+
+| Field | Value | Notes |
+| :--- | :--- | :--- |
+| **Title** | `High Priority: SQL Injection Attempt` | Clear title for your security dashboard. |
+| **Permission** | **Private** | |
+| **Alert Type** | **Scheduled** | The search will run automatically. |
+| **Run Alert** | **Every 5 minutes** | Set an optimal interval for near real-time detection. |
+| **Time Range** | **Last 5 minutes** | This ensures only new attacks are analyzed. |
+| **Trigger Condition** | **Number of Results** | |
+| **Trigger if** | **is greater than** | |
+| **Number** | **0** | Triggers the alert if **even one** malicious event is found. |
+| **Trigger Actions** | **Add Actions** $\rightarrow$ **Log Event** | This action writes a high-visibility security event to your Splunk logs. |
+| **Log to Index** | `_internal` | Standard index for security operation logs. |
+| **Event Text** | `SQL Injection detected from $host$ at $time$. Attacked file: login.php` | Provides clear context for a security analyst. |
+
+4.  Click **Save**.
+
+-----
+## 🚀 Let's check whether this alert works or not.
+Simply tries to access the login.php more than 1 times, then check...
+Use credentials as: Username - `admin' OR '1'='1` and password - any
+
+
+----
+## Dashboard
+
+
+
 
