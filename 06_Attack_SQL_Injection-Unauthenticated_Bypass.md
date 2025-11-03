@@ -1,14 +1,29 @@
-# SQL Injection (SQLi) - Unauthenticated Bypass (T1190)
-Objective
+## 🗺️SQL Injection (SQLi) - Unauthenticated Bypass (T1190)
 
-## 💻 Deploying the Vulnerable Application for SQLi
+### 🎯 Objective: Dashboard Creation for SQL Injection (SQLi)
+
+The objective of integrating the SQL Injection detection logic into a dashboard is to demonstrate mastery of **Incident Prioritization** and **Security Visualization**—core skills for a professional SOC Analyst.
+
+| Key Question | Explanation (Security Visualization Focus) |
+| :--- | :--- |
+| **What is the Objective?** | To create a **Single Pane of Glass** view that visually represents the real-time status of the web application layer. The dashboard transforms raw log data into **actionable intelligence** at a glance. |
+| **Why Are We Doing This?** | **Prioritization and Context:** A dashboard immediately shows security personnel the attack's frequency, the source IP, and its severity, allowing them to instantly prioritize this attack (an Initial Access attempt) against other events (like low-level port scans). |
+| **Workflow within the SOC:** | In a real SOC, the Splunk **Alert** (which you created) triggers a high-priority event. The **Dashboard Panel** serves as the initial visual proof and context. The analyst uses the dashboard to confirm the attack's ongoing status and the source IP before starting mitigation efforts. |
+
+#### The Objective of the Specific SQLi Panel:
+
+1.  **High Visibility:** Ensure the **Initial Access (T1190)** attack is immediately visible.
+2.  **Contextual Data:** Show the **Source IP** and the specific **Malicious Payload** attempted, linking the attacker's activity directly to the vulnerability.
+3.  **Performance Indicator:** Track the **frequency** of SQLi attempts to gauge the attacker's activity level (e.g., if they are using an automated scanner like SQLMap).
+
+### 💻 Deploying the Vulnerable Application for SQLi
 
 We will create two files in the Apache web root directory (`/var/www/html/`):
 
 1.  **`login.php`**: The vulnerable front-end login form.
 2.  **`setup.php`**: A utility script to create the necessary MySQL database and table.
 
-### 🛠️ Phase 1: Create the Setup Script and Database
+#### 🛠️ Phase 1: Create the Setup Script and Database
 
 We need a database and a table with a test user to make the login work.
 
@@ -100,7 +115,7 @@ sudo rm /var/www/html/setup.php
 
 -----
 
-### 😈 Phase 2: Create the Vulnerable Login Page (`login.php`)
+#### 😈 Phase 2: Create the Vulnerable Login Page (`login.php`)
 
 This is the key file for your SQLi demonstration. It is **deliberately insecure** because it directly inserts user input (`$_POST['username']` and `$_POST['password']`) into the SQL query **without any sanitization or using prepared statements**.
 
@@ -184,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 -----
 
-### ✅ Phase 3: Verify and Attack Setup
+#### ✅ Phase 3: Verify and Attack Setup
 
 **1. Restore Network Isolation**
 
@@ -225,7 +240,7 @@ Let's move directly to the **Mitigation Strategy**.
 
 -----
 
-## 🛡️ Implementing Mitigation: Secure Login Page
+### 🛡️ Implementing Mitigation: Secure Login Page
 
 The permanent defense against SQL Injection is to use **Prepared Statements**. This technique separates the SQL query logic from the user-supplied data, ensuring the input is *always* treated as data and never executable code.
 
@@ -322,7 +337,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </html>
 ```
 
-### 2\. Verify the Secure Page
+#### 2\. Verify the Secure Page
 
 1.  Open your browser on **Kali** and navigate to: `http://[Ubuntu-VM-IP-Address]/secure_login.php`
 2.  Try the **normal login** (`admin`/`password`)—it should succeed.
@@ -332,7 +347,7 @@ If the SQLi payload fails to bypass the login, your application is now secure ag
 
 -----
 
-## 📊 Next Step: Security Analysis with Splunk
+### 📊 Next Step: Security Analysis with Splunk
 
 We will move forward with **Analysing the log & creating the Splunk Alert** using a robust set of SQL Injection keywords.
 
@@ -340,7 +355,7 @@ We will move forward with **Analysing the log & creating the Splunk Alert** usin
 
 We will save our working search as the base and add the SQLi detection logic to it.
 
-### Step 1: Search Query for Alert Creation
+#### Step 1: Search Query for Alert Creation
 
 Use your working base search and apply the common SQLi patterns to the filtered events:
 
@@ -365,7 +380,7 @@ Here is a breakdown of that specific section of the log line:
 
 -----
 
-## 📐 Meaning of the Log Fields
+### 📐 Meaning of the Log Fields
 
 The segment of the access log highlighted follows the standard Apache Common Log Format (CLF) extension for including status codes and byte sizes:
 
@@ -376,7 +391,7 @@ The segment of the access log highlighted follows the standard Apache Common Log
 
 -----
 
-## 🔎 Security Implication for our Project
+### 🔎 Security Implication for our Project
 
 The byte size can be a powerful detection tool, especially for **Blind SQL Injection** or for identifying successful authentication bypasses:
 
@@ -385,12 +400,12 @@ The byte size can be a powerful detection tool, especially for **Blind SQL Injec
 
 ---
 
-### Step 2: Save the Search as an Alert
+#### Step 2: Save the Search as an Alert
 
 1.  Set the time range to **Last 5 minutes** (to prevent accidental triggers on historical data).
 2.  Click the **Save As** dropdown menu $\rightarrow$ Select **Alert**.
 
-### Step 3: Configure and Save the Alert
+#### Step 3: Configure and Save the Alert
 
 Configure the following fields in the alert creation window:
 
@@ -411,13 +426,13 @@ Configure the following fields in the alert creation window:
 4.  Click **Save**.
 
 -----
-## 🚀 Let's check whether this alert works or not.
+### 🚀 Let's check whether this alert works or not.
 Simply tries to access the login.php more than 1 times, then check...
 Use credentials as: Username - `admin' OR '1'='1` and password - any
 
 
 ----
-## Dashboard
+### Dashboard
 
 
 
