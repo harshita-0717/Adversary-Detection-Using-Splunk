@@ -1,3 +1,6 @@
+<img src="Images/front.png" alt="front_images" width="100%">
+
+
 # 🛡️ Adversary Detection Lab using Splunk (SOC Simulation)
 
 This project simulates a real-world Security Operations Center (SOC) environment, utilizing the Elastic/SIEM tool **Splunk** to detect, analyze, and report on cybersecurity attacks launched from an attacker machine.
