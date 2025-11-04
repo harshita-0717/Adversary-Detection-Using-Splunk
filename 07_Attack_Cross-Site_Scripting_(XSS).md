@@ -185,6 +185,8 @@ $conn->close();
 </body>
 </html>
 ```
+<img src="Images/07_normal_page.png" alt="images" width="100%">
+
 
 ### Step 3: Execute the Stored XSS Attack (Kali VM)
 
@@ -194,6 +196,8 @@ $conn->close();
       * **Username:** `XSS-Attacker`
       * **Comment:** `<script>alert('Stored XSS Success!')</script>`
 3.  Click **Post Comment**.
+
+<img src="Images/07_Success_XSS.png" alt="images" width="100%">
 
 ### Expected Result
 
@@ -315,6 +319,8 @@ sudo systemctl restart apache2
 2.  Post the malicious payload again (e.g., `<script>alert('XSS_FAIL')</script>`).
 3.  **Expected Result:** The page should display the full script tag as **plain text** on the screen, and the JavaScript alert box should **not** appear. This confirms the defense is effective.
 
+<img src="Images/07_Secure_XSS.png" alt="images" width="100%">
+
 -----
 
 ## 🚨 Phase 3: Detection with Splunk (XSS)
@@ -362,7 +368,8 @@ We will target the vulnerable submission (the `302` redirect).
     ```
 
       * **`302`**: Narrows the search down to only redirect events (the successful injection).
-      
+
+   <img src="Images/07_logs.png" alt="images" width="100%">
 
 ### Step 2: Save the Search as an Alert
 
@@ -386,6 +393,8 @@ Configure the following fields in the alert creation window:
 3\.  Click **Save**.
 
 -----
+
+<img src="Images/07_alert_generated.png" alt="images" width="100%">
 
 ## 🚀 Verification & Next Attack
 
