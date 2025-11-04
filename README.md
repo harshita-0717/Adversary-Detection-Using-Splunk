@@ -1,4 +1,4 @@
-<img src="Images/front.png" alt="front_images" width="100%">
+
 
 
 # 🛡️ Adversary Detection Lab using Splunk (SOC Simulation)
