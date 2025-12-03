@@ -55,6 +55,7 @@ The following table describes each attack phase documented in this repository, a
 | 6️⃣ | [06_Attack_SQL_Injection-Unauthenticated_Bypass.md](06_Attack_SQL_Injection-Unauthenticated_Bypass.md) | Demonstrates SQL Injection attacks, including unauthenticated login bypass techniques. |
 | 7️⃣ | [07_Attack_Cross-Site_Scripting_(XSS).md](07_Attack_Cross-Site_Scripting_(XSS).md) | Exploitation of XSS vulnerabilities to inject malicious client-side scripts. |
 | 8️⃣ | [08_Attack_Command_Injection.md](08_Attack_Command_Injection.md) | Command injection attacks that allow arbitrary command execution on the host system. |
+| 9️⃣ | [09_Attack_Fileless_Malware.md](09_Attack_Fileless_Malware.md) | Simulated a fileless T1059 attack where the victim executes a remote payload without saving it to disk. |
 
 ---
 
@@ -72,5 +73,5 @@ Each Markdown file provides:
 
 | File | Description |
 |------|-------------|
-| [09_Setup_LAMP.md](09_Setup_LAMP.md) | **LAMP Environment Setup** — installation and configuration of Linux, Apache, MySQL/MariaDB, and PHP. Includes prerequisites, installation commands, virtual host setup, and basic security hardening. |
-| [10_Splunk_Cleanup.md](10_Splunk_Cleanup.md) | **Splunk Cleanup & Maintenance** — instructions to safely clean indexes, remove old data, adjust retention settings, and perform Splunk maintenance tasks. |
+| [11_Setup_LAMP.md](09_Setup_LAMP.md) | **LAMP Environment Setup** — installation and configuration of Linux, Apache, MySQL/MariaDB, and PHP. Includes prerequisites, installation commands, virtual host setup, and basic security hardening. |
+| [12_Splunk_Cleanup.md](10_Splunk_Cleanup.md) | **Splunk Cleanup & Maintenance** — instructions to safely clean indexes, remove old data, adjust retention settings, and perform Splunk maintenance tasks. |
