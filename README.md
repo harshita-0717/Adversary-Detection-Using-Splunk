@@ -73,5 +73,5 @@ Each Markdown file provides:
 
 | File | Description |
 |------|-------------|
-| [11_Setup_LAMP.md](09_Setup_LAMP.md) | **LAMP Environment Setup** — installation and configuration of Linux, Apache, MySQL/MariaDB, and PHP. Includes prerequisites, installation commands, virtual host setup, and basic security hardening. |
-| [12_Splunk_Cleanup.md](10_Splunk_Cleanup.md) | **Splunk Cleanup & Maintenance** — instructions to safely clean indexes, remove old data, adjust retention settings, and perform Splunk maintenance tasks. |
+| [Setup_LAMP.md](Setup_LAMP_Stack.md) | **LAMP Environment Setup** — installation and configuration of Linux, Apache, MySQL/MariaDB, and PHP. Includes prerequisites, installation commands, virtual host setup, and basic security hardening. |
+| [Splunk_Cleanup.md](Splunk_cleanup.md) | **Splunk Cleanup & Maintenance** — instructions to safely clean indexes, remove old data, adjust retention settings, and perform Splunk maintenance tasks. |
