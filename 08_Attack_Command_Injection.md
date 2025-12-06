@@ -124,6 +124,9 @@ This confirms the vulnerability by forcing the server to run a simple, harmless 
     127.0.0.1 & whoami
     ```
 
+<img src="Images/08_normal_ping.png" alt="images" width="100%">
+<img src="Images/08_whoami.png" alt="images" width="100%">
+<img src="Images/08_ls.png" alt="images" width="100%">
 2.  Click **Ping Host**.
 
 3.  **Expected Result on the Web Page:** The command output will show the results of the `ping` command, immediately followed by the output of the `whoami` command, which will be the web server user (usually **`www-data`**).
